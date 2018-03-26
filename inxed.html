@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Hello World</title>
+    <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+</head>
+
+<body>
+    <div id="root"></div>
+    <script type="text/babel">
+        
+        function Tile(props){
+            return(
+                <i className="tile" >{props.representation}</i>
+            );
+        }
+        
+        class Map extends React.Component{
+            render() {
+                var rows = [];
+                var newP = <br/>;
+                for (let i=0; i < this.props.mapTiles.length; i++) {
+                    if (i%this.props.width == 0){
+                        rows.push(<br key={"br"+i} />);
+                    }
+                    rows.push(<Tile key={i} representation={this.props.mapTiles[i]}/>);
+                }
+                return (
+                    <div className="map">
+                        {rows}
+                    </div>
+                );
+            }
+        }
+        class Game extends React.Component{
+            constructor(props) {
+                super(props);
+                var initialPos =12;
+                this.MAP_HEIGHT = 5;
+                this.MAP_WIDTH = 5;
+                this.player_char = "@";
+                this.mapTiles= Array(this.MAP_WIDTH*this.MAP_HEIGHT).fill('~');
+                this.mapTiles[initialPos]=this.player_char;
+                this.state={
+                    map: this.mapTiles,
+                    player_position : initialPos,
+                }
+                this.handleKeyPress = this.handleKeyPress.bind(this);
+            }
+
+            playerMove(direction){
+                this.mapTiles= Array(this.MAP_WIDTH*this.MAP_HEIGHT).fill('~');
+                switch(direction){
+                    case "up":
+                        this.mapTiles[this.state.player_position-this.MAP_WIDTH]=this.player_char;
+                        this.setState({
+                            map: this.mapTiles,
+                            player_position: this.state.player_position-=this.MAP_WIDTH,
+                        });
+                        break;
+                    case "down":
+                        this.mapTiles[this.state.player_position+this.MAP_WIDTH]=this.player_char;
+                        this.setState({
+                            map: this.mapTiles,
+                            player_position: this.state.player_position+=this.MAP_WIDTH,
+                        });
+                        break;
+                    case "left":
+                        this.mapTiles[this.state.player_position-1]=this.player_char;
+                        this.setState({
+                            map: this.mapTiles,
+                            player_position: this.state.player_position-=1,
+                        });
+                        break;
+                    case "right":
+                    this.mapTiles[this.state.player_position+1]=this.player_char;
+                        this.setState({
+                            map: this.mapTiles,
+                            player_position: this.state.player_position+=1,
+                        });
+                        break;
+                }
+            }
+            handleKeyPress(e) {
+                this.setState({currentKey: e.keyCode});
+                if(e.keyCode==38){
+                    this.playerMove("up");
+                }else if(e.keyCode==40){
+                    this.playerMove("down");
+                }else if(e.keyCode==39){
+                    this.playerMove("right");
+                }else if(e.keyCode==37){
+                    this.playerMove("left");
+                }
+            }
+            componentDidMount() {
+                document.addEventListener('keydown', this.handleKeyPress);
+            }
+            componentWillUnmount() {
+                document.removeEventListener('keydown', this.handleKeyPress);
+            }
+            render(){
+                return(
+                    <Map mapTiles={this.state.map} width={this.MAP_WIDTH}/>
+                );
+            }
+        }
+
+        class Salute extends React.Component{
+            render() {
+                return (
+                    <h1>Welcome to PokHero</h1>
+                );
+            }
+        }
+
+        class Main extends React.Component{
+            render() {
+                return (
+                    <div>
+                        <Salute />
+                        <Game />
+                    </div>
+                );
+            }
+        }
+
+        ReactDOM.render(<Main /> , document.getElementById('root') );
+
+    </script>
+    <!--
+      Note: this page is a great way to try React but it's not suitable for production.
+      It slowly compiles JSX with Babel in the browser and uses a large development build of React.
+
+      To set up a production-ready React build environment, follow these instructions:
+      * https://reactjs.org/docs/add-react-to-a-new-app.html
+      * https://reactjs.org/docs/add-react-to-an-existing-app.html
+
+      You can also use React without JSX, in which case you can remove Babel:
+      * https://reactjs.org/docs/react-without-jsx.html
+      * https://reactjs.org/docs/cdn-links.html
+    -->
+</body>
+
+</html>
